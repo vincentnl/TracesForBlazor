@@ -5,8 +5,18 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
-        <IsPackable>false</IsPackable>
+        <IsPackable>true</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>0.0.1</Version>
+        <Title>Tracer for Blazor</Title>
+        <Authors>vincentnl</Authors>
+        <Description>A trace utility that outputs to an OpenTelemetry endpoint using manual instrumentation</Description>
+        <Copyright>2023</Copyright>
+        <PackageProjectUrl>https://github.com/vincentnl/TracesForBlazor</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/vincentnl/TracesForBlazor/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/vincentnl/TracesForBlazor</RepositoryUrl>
+        <PackageTags>Blazor OpenTelemetry Trace</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
