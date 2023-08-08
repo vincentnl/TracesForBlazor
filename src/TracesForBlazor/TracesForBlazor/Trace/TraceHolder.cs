@@ -1,5 +1,8 @@
-﻿namespace TracesForBlazor.Trace;
+﻿using System.Diagnostics;
 
+namespace TracesForBlazor.Trace;
+
+[DebuggerDisplay("{Name} {End==default?\"running\":\"closed\"}}")]
 internal class TraceHolder
 {
     public required string ServiceName { get; set; }

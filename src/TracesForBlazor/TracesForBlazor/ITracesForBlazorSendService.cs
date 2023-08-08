@@ -2,7 +2,7 @@
 
 namespace TracesForBlazor;
 
-public interface ITracesForBlazorSendService
+internal interface ITracesService
 {
-    public Task Purge();
+    Task Send();
 }

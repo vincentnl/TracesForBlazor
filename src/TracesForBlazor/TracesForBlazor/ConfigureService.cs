@@ -1,26 +1,25 @@
 ﻿using System.Runtime.CompilerServices;
-using System.Runtime.Versioning;
 using Microsoft.Extensions.DependencyInjection;
-using TracesForBlazor;
+
 [assembly: InternalsVisibleTo("TracerForBlazorTests")]
-namespace TracesForBlazor
-{
+namespace TracesForBlazor;
+
     public enum OpenTelemetrySendTypes
     {
         //Grpc,
         HttpProto
     }
-}
 
 public static class ConfigureService
 {
     public static void AddTracesForBlazor(this IServiceCollection services, TracerForBlazorOptions options,
         params TracesForBlazorActivitySource[] sources)
     {
-        VerifyOptions(options);
         if(sources.Length == 0)
             throw new ArgumentException("At least one ActivitySource is required");
-        services.AddSingleton<ITracesForBlazorSendService>(new TracerForBlazorSendService(options, sources));
+        VerifyOptions(options);
+        TracerService tracerService = new(sources, options);
+        services.AddSingleton(tracerService);
     }
 
     internal static void VerifyOptions(TracerForBlazorOptions options)
@@ -58,12 +57,12 @@ public static class ConfigureService
         if (string.IsNullOrEmpty(uri.Query))
         {
             UriBuilder uriBuilder = new UriBuilder(uri);
-            uriBuilder.Query = "v1/traces";
+            uriBuilder.Path = "v1/traces";
             options.Url = uriBuilder.ToString();
         }
     }
-    
-    public static bool IsValidUrl(string url)
+
+    private static bool IsValidUrl(string url)
     {
         Uri? uriResult;
         return Uri.TryCreate(url, UriKind.Absolute, out uriResult) &&
