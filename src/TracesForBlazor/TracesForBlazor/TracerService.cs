@@ -17,7 +17,6 @@ internal class TracerService:ITracesService
             source.TracerService = this;
         }
         _options = options;
-        _activitySources = sources.ToList();
         _sendService = new TracerForBlazorSendService(_options);
         _timer.AutoReset = true;
         _timer.Elapsed += TimerOnElapsed;
@@ -26,23 +25,26 @@ internal class TracerService:ITracesService
 
     private TraceHolder? _current;
     private readonly List<TraceHolder> _finishedTraces = new();
-    private List<TracesForBlazorActivitySource> _activitySources;
 
     public void Stop(TraceHolder trace)
     {
-        #if DEBUG
-        if(trace!=_current)
-            throw new InvalidOperationException("Trace is not current");
-        #endif
         if (trace.End.Equals(default))
         {
             trace.End = DateTimeOffset.UtcNow;
         }
         _current = trace.ParentTrace;
-        if (_current == null)
+        while(_current != null && _current.End != default)
+        {//set parent as first parent that is running
+            _current = _current.ParentTrace;
+        }
+        if(_current == null)
         {
+            while (trace.ParentTrace != null)
+            {
+                trace = trace.ParentTrace;
+            }
             _finishedTraces.Add(trace);
-        }         
+        }
     }
     
     public TraceHolder Start(string name, string serviceName)

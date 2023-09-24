@@ -1,12 +1,10 @@
 ﻿using System.Net.Http.Headers;
 using Google.Protobuf;
-using Grpc.Net.Client;
 using OpenTelemetry.Proto.Collector.Trace.V1;
 using OpenTelemetry.Proto.Common.V1;
 using OpenTelemetry.Proto.Resource.V1;
 using OpenTelemetry.Proto.Trace.V1;
 using TracesForBlazor.Trace;
-using Grpc.Net.Client.Web; 
 
 namespace TracesForBlazor;
 
@@ -44,7 +42,7 @@ internal class TracerForBlazorSendService
             {
                 Scope = new InstrumentationScope
                 {
-                    Name = "my.library",
+                    Name = "TracerForBlazor",
                     Version = "1.0.0"
                 }
             };
@@ -67,6 +65,17 @@ internal class TracerForBlazorSendService
                         EndTimeUnixNano = TraceRequestUtil.GetUnixTimeNanoSeconds(child.End),
                         Kind = Span.Types.SpanKind.Internal
                     };
+                    foreach (var valuePair in child.Tags)
+                    {
+                        span.Attributes.Add(new KeyValue
+                        {
+                            Key = valuePair.Key,
+                            Value = new AnyValue
+                            {
+                                StringValue = valuePair.Value
+                            }
+                        });
+                    }
                     if (parent != null) span.ParentSpanId = ByteString.CopyFrom(parent.SpanId.Id);
                     scopeSpan.Spans.Add(span);
                     if (child.ChildTraces.Count > 0) AddChildrenRecursive(child.ChildTraces, child);
@@ -96,21 +105,21 @@ internal class TracerForBlazorSendService
         }
     }
 
-    private async Task SendToGrpcEndpoint(List<TraceHolder> traces)
-    {
-        var request = CreateExportTraceServiceRequest(traces);
-        var httpClient = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler())); 
-        //var baseUri = services.GetRequiredService<NavigationManager>().BaseUri; 
-        var channel = GrpcChannel.ForAddress(_options.Url, new GrpcChannelOptions { HttpClient = httpClient }); 
-        //return new WeatherForecasts.WeatherForecastsClient(channel); 
-        
-        
-        
-        //var channel = GrpcChannel.ForAddress(url);
-        var client = new TraceService.TraceServiceClient(channel);
-        var response = await client.ExportAsync(request);
-        Console.WriteLine(response.ToString());
-    }
+    // private async Task SendToGrpcEndpoint(List<TraceHolder> traces)
+    // {
+    //     var request = CreateExportTraceServiceRequest(traces);
+    //     var httpClient = new HttpClient(new GrpcWebHandler(GrpcWebMode.GrpcWeb, new HttpClientHandler())); 
+    //     //var baseUri = services.GetRequiredService<NavigationManager>().BaseUri; 
+    //     var channel = GrpcChannel.ForAddress(_options.Url, new GrpcChannelOptions { HttpClient = httpClient }); 
+    //     //return new WeatherForecasts.WeatherForecastsClient(channel); 
+    //     
+    //     
+    //     
+    //     //var channel = GrpcChannel.ForAddress(url);
+    //     var client = new TraceService.TraceServiceClient(channel);
+    //     var response = await client.ExportAsync(request);
+    //     Console.WriteLine(response.ToString());
+    // }
 
     private byte[] Serialize(ExportTraceServiceRequest request)
     {

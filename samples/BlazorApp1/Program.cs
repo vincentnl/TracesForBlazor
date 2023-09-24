@@ -13,7 +13,7 @@ TracerForBlazorOptions options = new TracerForBlazorOptions()
 {
     //Url = "http://192.168.1.100:4318/v1/traces",
     Url = "http://192.168.1.100:4318",
-    Type = OpenTelemetrySendTypes.HttpProto,
+    SendType = OpenTelemetrySendTypes.HttpProto,
     SendInterval = TimeSpan.FromSeconds(3)
 };
 

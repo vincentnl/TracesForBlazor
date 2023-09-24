@@ -1,12 +1,7 @@
-﻿namespace TracesForBlazor
+﻿namespace TracesForBlazor.Trace
 {
     public class TraceRequestUtil
     {
-        public static ulong GetUnixTimeNanoSeconds(DateTime dateTime)
-        {
-            return (ulong)(dateTime - new DateTime(1970, 1, 1)).TotalSeconds * 1000000000;
-        }
-
         public static ulong GetUnixTimeNanoSeconds(DateTimeOffset dateTime)
         {
             var span = (dateTime.UtcDateTime - new DateTime(1970, 1, 1));

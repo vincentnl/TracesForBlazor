@@ -1,6 +1,4 @@
-﻿using TracesForBlazor.Trace;
-
-namespace TracesForBlazor;
+﻿namespace TracesForBlazor;
 
 internal interface ITracesService
 {
